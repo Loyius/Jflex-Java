@@ -1,0 +1,30 @@
+program Demo
+{
+  final int limite = 10;
+  int x, y;
+  float media;
+  char letra;
+
+  /* comentario simples
+     em multiplas linhas */
+
+  x = 0x1A;
+  y = 25;
+  media = 3.14;
+  letra = 'a';
+
+  if (x >= y) {
+    print(x, 2);
+  } else {
+    read(y);
+  }
+
+  while (x < 0xFF) {
+    x = x + 1;
+  }
+
+  media = 5.;
+  media = .5;
+  y = 0XFF;
+  x = 0x;
+}
