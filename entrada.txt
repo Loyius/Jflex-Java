@@ -22,6 +22,9 @@ program Demo
   while (x < 0xFF) {
     x = x + 1;
   }
-  
-  media = 5.0;
+
+  media = 5.;
+  media = .5;
+  y = 0XFF;
+  x = 0x;
 }
