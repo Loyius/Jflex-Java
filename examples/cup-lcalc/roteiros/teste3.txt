@@ -1,0 +1,8 @@
+program MinhaCalc
+    int a;
+    float x, y;
+    int[] vetor;
+{
+    1 + 2;
+    3 * 4;
+}

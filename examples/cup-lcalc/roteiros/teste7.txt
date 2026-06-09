@@ -1,0 +1,6 @@
+program Calc {
+    5 @ 3;
+    while (1 < 2) {
+        10;
+    }
+}

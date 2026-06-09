@@ -1,0 +1,154 @@
+import java_cup.runtime.*;
+import erros.ListaErros;
+import java.util.Scanner;
+
+parser code {:
+    int contador = 0;
+    double somatorio = 0.0;
+    Scanner teclado = new Scanner(System.in);
+
+    public void imprimirRelatorio() {
+        System.out.println("-----------------------------");
+        System.out.println("Total de expressoes: " + contador);
+        System.out.println("Somatorio total:     " + somatorio);
+        System.out.println("-----------------------------");
+    }
+
+    // chamado automaticamente pelo CUP ao detectar erro sintatico
+    public void syntax_error(java_cup.runtime.Symbol s) {
+        Lexer sc = (Lexer) this.getScanner();
+        sc.defineErro(s.left, s.right);
+    }
+
+    public void defineError(int linha, int coluna, String texto) {
+        Lexer sc = (Lexer) this.getScanner();
+        sc.defineErro(linha, coluna, texto);
+    }
+
+    public void defineError(String texto) {
+        Lexer sc = (Lexer) this.getScanner();
+        sc.defineErro(texto);
+    }
+:};
+
+terminal           SEMI, PLUS, MINUS, TIMES, DIVIDE, MOD, LPAREN, RPAREN;
+terminal           PTO, ABRE_COLCH, FECHA_COLCH, VIRG;
+terminal           ABRE_CHAVE, FECHA_CHAVE, IGUAL;
+terminal           KW_IF, KW_ELSE, KW_WHILE, KW_PROGRAM;
+terminal           MAIOR, MENOR, MAIORIGUAL, MENORIGUAL, IGUALIGUAL, DIF;
+terminal Double    NUMBER;
+terminal String    IDENT;
+
+non terminal       program, varDecl_aux, varDecl, varDecl_op, type;
+non terminal       statement_aux, statement, if_stmt, else_stmt, while_stmt;
+non terminal       condicao, op_relacional;
+non terminal Object  expr_part;
+non terminal Double  expr, factor, term, designator;
+
+start with program;
+
+program ::= KW_PROGRAM IDENT varDecl_aux ABRE_CHAVE statement_aux FECHA_CHAVE
+          ;
+
+varDecl_aux ::= varDecl varDecl_aux
+              | /* vazio */
+              ;
+
+varDecl ::= type IDENT:id
+            {: System.out.print("Declaracao de variavel: " + id); :}
+            varDecl_op SEMI
+            {: System.out.println(""); :}
+          ;
+
+varDecl_op ::= varDecl_op VIRG IDENT:id
+               {: System.out.print(", " + id); :}
+             | /* vazio */
+             ;
+
+type ::= IDENT ABRE_COLCH FECHA_COLCH
+       | IDENT
+       ;
+
+statement_aux ::= statement_aux statement
+                | statement
+                ;
+
+statement ::= expr_part
+            | designator IGUAL expr:e SEMI
+              {: System.out.println("Atribuicao reconhecida: " + e); :}
+            | if_stmt
+            | while_stmt
+            | error {: parser.defineError("Erro de sintaxe"); :}
+            ;
+
+if_stmt ::= KW_IF LPAREN condicao RPAREN ABRE_CHAVE statement_aux FECHA_CHAVE else_stmt
+          ;
+
+else_stmt ::= KW_ELSE ABRE_CHAVE statement_aux FECHA_CHAVE
+            | /* vazio */
+            ;
+
+while_stmt ::= KW_WHILE LPAREN condicao RPAREN ABRE_CHAVE statement_aux FECHA_CHAVE
+             ;
+
+condicao ::= expr op_relacional expr
+           ;
+
+op_relacional ::= MAIOR
+                | MENOR
+                | MAIORIGUAL
+                | MENORIGUAL
+                | IGUALIGUAL
+                | DIF
+                | error {: parser.defineError("Operador relacional invalido"); :}
+                ;
+
+expr_part ::= expr:e
+              {:
+                  System.out.println(" = " + e);
+                  parser.contador++;
+                  parser.somatorio += e;
+              :}
+              SEMI
+            ;
+
+expr ::= expr:e PLUS factor:f
+         {: System.out.println("+ "); RESULT = e + f; :}
+       | expr:e MINUS factor:f
+         {: System.out.println("- "); RESULT = e - f; :}
+       | MINUS factor:f
+         {: System.out.println("u- "); RESULT = -f; :}
+       | factor:f
+         {: RESULT = f; :}
+       ;
+
+factor ::= term:t TIMES factor:f
+           {: System.out.println("* "); RESULT = t * f; :}
+         | term:t DIVIDE factor:f
+           {: System.out.println("/ "); RESULT = t / f; :}
+         | term:t MOD factor:f
+           {: System.out.println("% "); RESULT = t % f; :}
+         | term:t
+           {: RESULT = t; :}
+         ;
+
+term ::= LPAREN expr:e RPAREN
+         {: RESULT = e; :}
+       | NUMBER:n
+         {: System.out.println(n + " "); RESULT = n; :}
+       | designator
+         {:
+             System.out.print("Informe o valor do designator: ");
+             RESULT = parser.teclado.nextDouble();
+         :}
+       ;
+
+designator ::= designator ABRE_COLCH expr:idx FECHA_COLCH
+               {:
+                   if (idx < 0) {
+                       System.out.println("ERRO SEMANTICO: indice negativo de vetor!");
+                   }
+               :}
+             | designator PTO IDENT
+             | IDENT
+             ;

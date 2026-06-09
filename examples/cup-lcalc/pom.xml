@@ -53,6 +53,9 @@
               <goal>generate</goal>
             </goals>
             <configuration>
+              <lexDefinitions>
+                <lexDefinition>src/main/jflex/scanner.flex</lexDefinition>
+              </lexDefinitions>
             </configuration>
           </execution>
         </executions>
@@ -67,13 +70,10 @@
               <goal>generate</goal>
             </goals>
             <configuration>
+              <cupDefinition>src/main/cup/parser.cup</cupDefinition>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <!-- By default runs:
-          cup -destdir target/generated-sources/cup -parser parser -symbols sym src/main/cup/ycalc.cup -->
-        </configuration>
       </plugin>
       <!-- Build an Uberjar -->
       <plugin>
