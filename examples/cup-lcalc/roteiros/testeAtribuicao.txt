@@ -1,0 +1,11 @@
+program testeAtribuicao
+int a;
+int[] vetor;
+Pessoa p;
+{
+    a = 10;
+    a = 2 + 3;
+    1 + 2;
+    vetor[0] = 100;
+    p.nome = 50;
+}

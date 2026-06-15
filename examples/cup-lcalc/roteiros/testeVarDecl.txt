@@ -1,0 +1,5 @@
+program teste6
+Pessoa cliente;
+{
+    1+2;
+}

@@ -1,0 +1,283 @@
+import java_cup.runtime.*;
+import erros.ListaErros;
+import java.util.Scanner;
+import java.util.Deque;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Map;
+
+parser code {:
+    int contador = 0;
+    double somatorio = 0.0;
+    Scanner teclado = new Scanner(System.in);
+    Map<String, Double> tabelaSimbolos = new HashMap<>();
+    boolean executar = true;
+    Deque<Boolean> executarStack = new ArrayDeque<>();
+    Deque<Boolean> elseStack    = new ArrayDeque<>();
+
+    public void imprimirRelatorio() {
+        System.out.println("-----------------------------");
+        System.out.println("Total de expressoes: " + contador);
+        System.out.println("Somatorio total:     " + somatorio);
+        System.out.println("-----------------------------");
+    }
+
+    // push for if: body executes only when cond is true (and outer is also true)
+    public void pushIf(boolean cond) {
+        executarStack.push(executar);
+        elseStack.push(executar && !cond);   // else executes when outer=true AND cond=false
+        executar = executar && cond;
+    }
+    // switch from if-body to else-body
+    public void transitionToElse() {
+        executar = elseStack.peek();
+    }
+    // restore after full if/else
+    public void popIf() {
+        executar = executarStack.pop();
+        elseStack.pop();
+    }
+
+    // push for while/for: body executes only when cond is true
+    public void pushBlock(boolean cond) {
+        executarStack.push(executar);
+        executar = executar && cond;
+    }
+    public void popBlock() {
+        if (!executarStack.isEmpty()) executar = executarStack.pop();
+    }
+
+    public void syntax_error(java_cup.runtime.Symbol s) {
+        Lexer sc = (Lexer) this.getScanner();
+        sc.defineErro(s.left, s.right);
+    }
+    public void defineError(int linha, int coluna, String texto) {
+        Lexer sc = (Lexer) this.getScanner();
+        sc.defineErro(linha, coluna, texto);
+    }
+    public void defineError(int linha, int coluna) {
+        Lexer sc = (Lexer) this.getScanner();
+        sc.defineErro(linha, coluna);
+    }
+    public void defineError(String texto) {
+        Lexer sc = (Lexer) this.getScanner();
+        sc.defineErro(texto);
+    }
+:};
+
+terminal           SEMI, PLUS, MINUS, TIMES, DIVIDE, MOD, LPAREN, RPAREN;
+terminal           PTO, ABRE_COLCH, FECHA_COLCH, VIRG;
+terminal           ABRE_CHAVE, FECHA_CHAVE, IGUAL;
+terminal           KW_IF, KW_ELSE, KW_WHILE, KW_PROGRAM;
+terminal           KW_DO, KW_FOR;
+terminal           KW_TRUE, KW_FALSE;
+terminal           MAIOR, MENOR, MAIORIGUAL, MENORIGUAL, IGUALIGUAL, DIF;
+terminal Double    NUMBER;
+terminal String    IDENT;
+
+non terminal         program, varDecl_aux, varDecl, varDecl_op, type;
+non terminal         statement_aux, statement;
+non terminal         if_head, if_block, if_stmt, else_stmt;
+non terminal         while_head, while_stmt, do_while_stmt;
+non terminal         for_cond_head, for_stmt;
+non terminal Boolean condicao;
+non terminal String  op_relacional;
+non terminal Object  expr_part;
+non terminal Double  expr, factor, term;
+non terminal String  designator;
+
+start with program;
+
+program ::= KW_PROGRAM IDENT varDecl_aux ABRE_CHAVE statement_aux FECHA_CHAVE
+          ;
+
+varDecl_aux ::= varDecl varDecl_aux
+              | /* vazio */
+              ;
+
+varDecl ::= type IDENT:id
+            {: System.out.println("Declaracao de variavel: " + id); :}
+            varDecl_op SEMI
+          ;
+
+varDecl_op ::= varDecl_op VIRG IDENT:id
+               {: System.out.println("Declaracao de variavel: " + id); :}
+             | /* vazio */
+             ;
+
+type ::= IDENT ABRE_COLCH FECHA_COLCH
+       | IDENT
+       ;
+
+statement_aux ::= statement_aux statement
+                | statement
+                ;
+
+statement ::= expr_part
+            | designator:d IGUAL expr:e SEMI
+              {:
+                  if (parser.executar) {
+                      parser.tabelaSimbolos.put(d, e);
+                      System.out.println("Atribuicao reconhecida: " + e);
+                  }
+              :}
+            | if_stmt
+            | while_stmt
+            | do_while_stmt
+            | for_stmt
+            | error {: parser.defineError("Erro de sintaxe"); :}
+            ;
+
+/* ── IF / ELSE ─────────────────────────────────────────────────────── */
+
+if_head ::= KW_IF LPAREN condicao:c RPAREN
+            {: parser.pushIf(c); :}
+            ;
+
+if_block ::= if_head ABRE_CHAVE statement_aux FECHA_CHAVE
+             {: parser.transitionToElse(); :}
+             ;
+
+if_stmt ::= if_block else_stmt
+            {: parser.popIf(); :}
+          | KW_IF error
+            {: parser.defineError("IF incompleto ou sem parenteses"); :}
+          ;
+
+else_stmt ::= KW_ELSE ABRE_CHAVE statement_aux FECHA_CHAVE
+            | /* vazio */
+            ;
+
+/* ── WHILE ──────────────────────────────────────────────────────────── */
+
+while_head ::= KW_WHILE LPAREN condicao:c RPAREN
+               {: parser.pushBlock(c); :}
+               ;
+
+while_stmt ::= while_head ABRE_CHAVE statement_aux FECHA_CHAVE
+               {: parser.popBlock(); :}
+             | KW_WHILE error
+               {: parser.defineError("WHILE incompleto ou sem parenteses"); :}
+             ;
+
+/* ── DO-WHILE ────────────────────────────────────────────────────────
+   In do-while, the body always executes once before the condition is
+   checked. We parse the body normally, then evaluate the condition.
+   A false literal triggers a semantic warning.                        */
+
+do_while_stmt ::= KW_DO ABRE_CHAVE statement_aux FECHA_CHAVE
+                  KW_WHILE LPAREN condicao:c RPAREN SEMI
+                  {: if (!c) parser.defineError("Erro semantico: do-while com condicao sempre falsa"); :}
+                | KW_DO error
+                  {: parser.defineError("DO-WHILE incompleto"); :}
+                ;
+
+/* ── FOR ─────────────────────────────────────────────────────────────
+   Condition is evaluated before the body, so we gate with pushBlock.  */
+
+for_cond_head ::= KW_FOR LPAREN designator IGUAL expr SEMI condicao:c SEMI designator IGUAL expr RPAREN
+                  {: parser.pushBlock(c); :}
+                  ;
+
+for_stmt ::= for_cond_head ABRE_CHAVE statement_aux FECHA_CHAVE
+             {: parser.popBlock(); :}
+           | KW_FOR error
+             {: parser.defineError("FOR incompleto"); :}
+           ;
+
+/* ── CONDICAO ────────────────────────────────────────────────────────── */
+
+condicao ::= expr:e1 op_relacional:op expr:e2
+             {:
+                 boolean r = false;
+                 switch (op) {
+                     case ">":  r = e1 > e2;         break;
+                     case "<":  r = e1 < e2;         break;
+                     case ">=": r = e1 >= e2;        break;
+                     case "<=": r = e1 <= e2;        break;
+                     case "==": r = e1.equals(e2);   break;
+                     case "!=": r = !e1.equals(e2);  break;
+                     default:   r = true;
+                 }
+                 RESULT = r;
+             :}
+           | KW_TRUE
+             {: RESULT = true; :}
+           | KW_FALSE:f
+             {: parser.defineError(fleft, fright, "Erro semantico: condicao sempre falsa"); RESULT = false; :}
+           ;
+
+op_relacional ::= MAIOR      {: RESULT = ">"; :}
+                | MENOR      {: RESULT = "<"; :}
+                | MAIORIGUAL {: RESULT = ">="; :}
+                | MENORIGUAL {: RESULT = "<="; :}
+                | IGUALIGUAL {: RESULT = "=="; :}
+                | DIF        {: RESULT = "!="; :}
+                | error
+                  {: parser.defineError("Condicao sem operador relacional valido"); RESULT = "=="; :}
+                ;
+
+/* ── EXPRESSOES ─────────────────────────────────────────────────────── */
+
+expr_part ::= expr:e
+              {:
+                  if (parser.executar) {
+                      System.out.println(" = " + e);
+                      parser.contador++;
+                      parser.somatorio += e;
+                  }
+              :}
+              SEMI
+            ;
+
+expr ::= expr:e PLUS factor:f
+         {: if (parser.executar) System.out.println("+ "); RESULT = e + f; :}
+       | expr:e MINUS factor:f
+         {: if (parser.executar) System.out.println("- "); RESULT = e - f; :}
+       | MINUS factor:f
+         {: if (parser.executar) System.out.println("u- "); RESULT = -f; :}
+       | factor:f
+         {: RESULT = f; :}
+       ;
+
+factor ::= factor:f TIMES term:t
+           {: if (parser.executar) System.out.println("* "); RESULT = f * t; :}
+         | factor:f DIVIDE term:t
+           {: if (parser.executar) System.out.println("/ "); RESULT = f / t; :}
+         | factor:f MOD term:t
+           {: if (parser.executar) System.out.println("% "); RESULT = f % t; :}
+         | term:t
+           {: RESULT = t; :}
+         ;
+
+term ::= LPAREN expr:e RPAREN
+         {: RESULT = e; :}
+       | NUMBER:n
+         {: if (parser.executar) System.out.println(n + " "); RESULT = n; :}
+       | designator:d
+         {:
+             if (parser.executar) {
+                 if (parser.tabelaSimbolos.containsKey(d)) {
+                     RESULT = parser.tabelaSimbolos.get(d);
+                 } else {
+                     System.out.print("Informe o valor da variavel (" + d + "): ");
+                     double val = parser.teclado.nextDouble();
+                     parser.tabelaSimbolos.put(d, val);
+                     RESULT = val;
+                 }
+             } else {
+                 RESULT = 0.0;
+             }
+         :}
+       ;
+
+designator ::= designator:d ABRE_COLCH expr:idx FECHA_COLCH
+               {:
+                   if (idx < 0) parser.defineError(idxleft, idxright, "Erro semantico: indice negativo de vetor");
+                   RESULT = d + "[" + idx.intValue() + "]";
+               :}
+             | designator:d PTO IDENT:campo
+               {: RESULT = d + "." + campo; :}
+             | IDENT:id
+               {: RESULT = id; :}
+             ;
