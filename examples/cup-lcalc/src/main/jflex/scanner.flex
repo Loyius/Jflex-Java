@@ -41,21 +41,23 @@ import erros.ListaErros;
 
 LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [ \t\f]
+letra          = [A-Za-z_]
+digito         = [0-9]
+ident          = {letra}({letra}|{digito})*
 dec_num_lit    = (0 | [1-9][0-9]*)(\.[0-9]+)?
-dec_int_id     = [A-Za-z_][A-Za-z_0-9]*
 
 %%
 
 <YYINITIAL> {
 
     ";"     { return symbol(sym.SEMI); }
-    "+"     { System.out.print(" + "); return symbol(sym.PLUS); }
-    "-"     { System.out.print(" - "); return symbol(sym.MINUS); }
-    "*"     { System.out.print(" * "); return symbol(sym.TIMES); }
-    "/"     { System.out.print(" / "); return symbol(sym.DIVIDE); }
-    "%"     { System.out.print(" % "); return symbol(sym.MOD); }
-    "("     { System.out.print(" ( "); return symbol(sym.LPAREN); }
-    ")"     { System.out.print(" ) "); return symbol(sym.RPAREN); }
+    "+"     { return symbol(sym.PLUS); }
+    "-"     { return symbol(sym.MINUS); }
+    "*"     { return symbol(sym.TIMES); }
+    "/"     { return symbol(sym.DIVIDE); }
+    "%"     { return symbol(sym.MOD); }
+    "("     { return symbol(sym.LPAREN); }
+    ")"     { return symbol(sym.RPAREN); }
     "."     { return symbol(sym.PTO); }
     "["     { return symbol(sym.ABRE_COLCH); }
     "]"     { return symbol(sym.FECHA_COLCH); }
@@ -77,11 +79,14 @@ dec_int_id     = [A-Za-z_][A-Za-z_0-9]*
     "if"        { return symbol(sym.KW_IF); }
     "else"      { return symbol(sym.KW_ELSE); }
     "while"     { return symbol(sym.KW_WHILE); }
+    "do"        { return symbol(sym.KW_DO); }
+    "for"       { return symbol(sym.KW_FOR); }
+    "true"      { return symbol(sym.KW_TRUE); }
+    "false"     { return symbol(sym.KW_FALSE); }
 
-    {dec_num_lit}   { System.out.print(yytext());
-                      return symbol(sym.NUMBER, Double.valueOf(yytext())); }
+    {dec_num_lit}   { return symbol(sym.NUMBER, Double.valueOf(yytext())); }
 
-    {dec_int_id}    { return symbol(sym.IDENT, yytext()); }
+    {ident}         { return symbol(sym.IDENT, yytext()); }
 
     {WhiteSpace}    { /* skip */ }
 }

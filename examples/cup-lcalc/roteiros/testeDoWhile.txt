@@ -1,0 +1,5 @@
+program TesteDoWhile {
+    do {
+        1 + 2;
+    } while (1 < 10);
+}

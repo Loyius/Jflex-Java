@@ -1,0 +1,6 @@
+program TesteFor {
+    for (i = 0; 1 < 10; i = 0) {
+        1 + 2;
+        3 * 4;
+    }
+}

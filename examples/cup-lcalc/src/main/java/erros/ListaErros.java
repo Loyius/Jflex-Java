@@ -14,10 +14,14 @@ public class ListaErros {
         erros.add(new Erro(linha, coluna));
     }
 
-    // preenche a mensagem do ultimo erro inserido (chamado pelo syntax_error)
+    // varre do fim para o início procurando o primeiro erro sem texto e preenche
     public void defineErro(String texto) {
-        if (!erros.isEmpty()) {
-            erros.get(erros.size() - 1).setMensagem(texto);
+        for (int i = erros.size() - 1; i >= 0; i--) {
+            Erro e = erros.get(i);
+            if (e.getMensagem().isEmpty()) {
+                e.setMensagem(texto);
+                return;
+            }
         }
     }
 
@@ -27,7 +31,7 @@ public class ListaErros {
 
     public void imprimir() {
         if (erros.isEmpty()) {
-            System.out.println("Nenhum erro encontrado.");
+            System.out.println("Analise concluida sem erros.");
         } else {
             System.out.println("=== Lista de Erros ===");
             for (Erro e : erros) {

@@ -15,6 +15,10 @@ public class Erro {
         this(linha, coluna, "");
     }
 
+    public String getMensagem() {
+        return mensagem;
+    }
+
     public void setMensagem(String mensagem) {
         this.mensagem = mensagem;
     }

@@ -1,0 +1,9 @@
+program TesteDesignator {
+    x + 2;
+    vetor[10] + 5;
+    vetor[i+1];
+    obj.nome;
+    obj.endereco.rua;
+    matriz[i][j];
+    vetor[-1];
+}
