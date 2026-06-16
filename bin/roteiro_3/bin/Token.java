@@ -16,7 +16,7 @@ public class Token {
     }
 
     public String tipoNome() {
-        return sym.nomeToken(tipo);
+        return String.valueOf(tipo);
     }
 
     @Override

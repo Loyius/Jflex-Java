@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java_cup.runtime.*;
 
 /**
  * Main.java — Orquestrador do compilador Java-- (Entrega 1: Análise Léxica + Sintática)
@@ -7,7 +8,6 @@ import java.util.*;
  * Uso: java Main <arquivo_entrada> [<arquivo_saida>]
  *
  * Saída: imprime no console E grava em saida.txt:
- *   - Cada token: <TIPO, lexema, linha>
  *   - Erros léxicos e sintáticos com número de linha
  *   - Mensagem final de sucesso ou falha
  *
@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
 
         // ── Argumentos ─────────────────────────────────────────────────────────
         String arquivoEntrada = "entrada.txt";
@@ -34,46 +34,27 @@ public class Main {
             log(pw, "Saída   : " + arquivoSaida);
             log(pw, "");
 
-            // ── Lê o arquivo de entrada ─────────────────────────────────────────
-            String conteudo;
-            try {
-                conteudo = new String(java.nio.file.Files.readAllBytes(
-                        java.nio.file.Paths.get(arquivoEntrada)));
-            } catch (IOException e) {
+            // ── Verifica arquivo de entrada ─────────────────────────────────────────
+            File file = new File(arquivoEntrada);
+            if (!file.exists()) {
                 log(pw, "ERRO: arquivo de entrada não encontrado: " + arquivoEntrada);
                 return;
             }
 
-            // ── Análise Léxica ──────────────────────────────────────────────────
-            log(pw, "--- FASE 1: ANÁLISE LÉXICA ---");
-            Scanner scanner = new Scanner(conteudo, pw);
-            scanner.tokenizar();
-
-            List<Token>  tokens      = scanner.getTokens();
-            List<String> errosLex    = scanner.getErros();
-
-            log(pw, "");
-            log(pw, "Tokens reconhecidos : " + tokens.size());
-            log(pw, "Erros léxicos       : " + errosLex.size());
-            log(pw, "");
-
-            // ── Análise Sintática ────────────────────────────────────────────────
-            log(pw, "--- FASE 2: ANÁLISE SINTÁTICA ---");
-            parser p = new parser(tokens, pw);
-            p.parse();
-
-            log(pw, "");
-            log(pw, "Erros sintáticos    : " + p.getErros());
-            log(pw, "");
-
-            // ── Resultado final ──────────────────────────────────────────────────
-            boolean semErros = errosLex.isEmpty() && p.isSucesso();
-            if (semErros) {
+            // ── Análise Léxica e Sintática ────────────────────────────────────────────────
+            log(pw, "--- FASE 1 e 2: ANÁLISE LÉXICA E SINTÁTICA ---");
+            Scanner scanner = new Scanner(new FileReader(file));
+            parser p = new parser(scanner);
+            p.setOutput(pw);
+            
+            try {
+                p.parse();
+                log(pw, "");
                 log(pw, ">>> Análise sintática concluída com sucesso <<<");
-            } else {
+            } catch (Exception e) {
+                log(pw, "");
                 log(pw, ">>> Análise encerrada com erros <<<");
-                log(pw, "    Erros léxicos   : " + errosLex.size());
-                log(pw, "    Erros sintáticos: " + p.getErros());
+                log(pw, "    Erro detectado: " + e.getMessage());
             }
 
         } finally {

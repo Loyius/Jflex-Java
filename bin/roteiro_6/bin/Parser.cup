@@ -23,10 +23,13 @@ action code {:
 
 parser code {:
     private java.io.PrintWriter out = null;
+    private int numErros = 0;
     public void setOutput(java.io.PrintWriter pw) { this.out = pw; }
+    public int getErros() { return numErros; }
 
     @Override
     public void report_error(String message, Object info) {
+        numErros++;
         StringBuilder sb = new StringBuilder("ERRO SINTATICO: " + message);
         if (info instanceof Symbol) {
             Symbol s = (Symbol) info;
@@ -58,6 +61,7 @@ terminal           SEMICOLON, COMMA, DOT;     /* ;  ,  . */
 terminal           LPAREN, RPAREN;            /* (  ) */
 terminal           LBRACE, RBRACE;            /* {  } */
 terminal           LBRACKET, RBRACKET;        /* [  ] */
+terminal           UMINUS;                    /* unary minus precedence */
 terminal String    IDENT;
 terminal Integer   INT_LIT, INT_HEX;
 terminal Double    FLOAT_LIT;
@@ -93,6 +97,7 @@ non terminal           expr_unary;
 non terminal           expr_prim;
 non terminal           call_args, call_args_opt;
 non terminal           ident_suffix;
+non terminal           ident_list, for_init, for_update;
 
 /* ─── Precedências (menor para maior) ──────────────────────────────────────── */
 precedence left  OR;
@@ -148,7 +153,6 @@ var_decl ::=
     ;
 
 /* Lista extra de idents numa mesma declaração: int x, y, z; */
-non terminal ident_list;
 ident_list ::=
       ident_list COMMA IDENT
     | IDENT
@@ -222,14 +226,14 @@ for_stmt ::=
       KW_FOR LPAREN for_init SEMICOLON expr SEMICOLON for_update RPAREN stmt
     ;
 
-non terminal for_init;
+
 for_init ::=
       tipo IDENT ASSIGN expr
     | IDENT ASSIGN expr
     | /* vazio */
     ;
 
-non terminal for_update;
+
 for_update ::=
       IDENT ASSIGN expr
     | /* vazio */
