@@ -1,0 +1,17 @@
+/* Roteiro 5: Expressoes logicas */
+program R5 {
+  boolean a;
+  boolean b;
+  int x;
+
+  void teste() {
+    a = true;
+    b = false;
+    x = 1;
+    if (a && b) { print(a); }       /* ok */
+    if (a || b) { print(b); }       /* ok */
+    if (x && b) { print(x); }      /* ERRO: int em operacao logica */
+    if (!a) { print(a); }           /* ok */
+    if (!x) { print(x); }           /* ERRO: int em negacao logica */
+  }
+}

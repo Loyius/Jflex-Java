@@ -1,0 +1,15 @@
+/* Roteiro 2: Compatibilidade de tipos */
+program R2 {
+  int x;
+  float y;
+  boolean b;
+
+  void teste() {
+    x = 10;       /* ok: int <- int */
+    y = 3.14;     /* ok: float <- float */
+    y = x;        /* ok: float <- int (promocao) */
+    x = 3.14;     /* ERRO: int <- float (perda de precisao) */
+    b = 1;        /* ERRO: boolean <- int */
+    b = true;     /* ok */
+  }
+}

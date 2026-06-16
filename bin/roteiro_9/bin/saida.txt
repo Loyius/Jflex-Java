@@ -1,0 +1,59 @@
+=== Compilador Java-- | Roteiro 9 - Tipo de retorno de funcoes ===
+Entrada: entrada.txt  |  Saida: saida.txt
+
+--- FASE 1: ANALISE LEXICA ---
+<program, program, linha 2>
+<IDENT, R9, linha 2>
+<{, {, linha 2>
+<int, int, linha 3>
+<IDENT, retornaInt, linha 3>
+<(, (, linha 3>
+<), ), linha 3>
+<{, {, linha 3>
+<return, return, linha 4>
+<INT, 42, linha 4>
+<;, ;, linha 4>
+<}, }, linha 5>
+<float, float, linha 7>
+<IDENT, retornaFloat, linha 7>
+<(, (, linha 7>
+<), ), linha 7>
+<{, {, linha 7>
+<return, return, linha 8>
+<FLOAT, 3.14, linha 8>
+<;, ;, linha 8>
+<}, }, linha 9>
+<int, int, linha 11>
+<IDENT, errado, linha 11>
+<(, (, linha 11>
+<), ), linha 11>
+<{, {, linha 11>
+<return, return, linha 12>
+<FLOAT, 3.14, linha 12>
+<;, ;, linha 12>
+<}, }, linha 13>
+<void, void, linha 15>
+<IDENT, semRetorno, linha 15>
+<(, (, linha 15>
+<), ), linha 15>
+<{, {, linha 15>
+<return, return, linha 16>
+<INT, 1, linha 16>
+<;, ;, linha 16>
+<}, }, linha 17>
+<}, }, linha 18>
+<EOF, $EOF, linha 19>
+Tokens: 41 | Erros lexicos: 0
+
+--- FASE 2: ANALISE SINTATICA ---
+Erros sintaticos: 0
+
+--- FASE 3: ANALISE SEMANTICA (Roteiro 9 - Tipo de retorno de funcoes) ---
+ERRO SEMANTICO (linha 12): funcao 'errado': retorno esperado 'int', encontrado 'float'
+ERRO SEMANTICO (linha 16): funcao 'semRetorno': retorno esperado 'void', encontrado 'int'
+Erros semanticos: 2
+
+>>> Analise encerrada com erros <<<
+    Erros lexicos   : 0
+    Erros sintaticos: 0
+    Erros semanticos: 2

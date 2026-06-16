@@ -1,0 +1,15 @@
+/* Roteiro 3: Expressoes aritmeticas */
+program R3 {
+  int a;
+  float b;
+  boolean flag;
+
+  void teste() {
+    a = 5;
+    b = 2.0;
+    flag = true;
+    a = a + b;          /* aviso: int + float */
+    b = a * b;          /* ok: numericos */
+    a = flag + 1;       /* ERRO: boolean em operacao aritmetica */
+  }
+}

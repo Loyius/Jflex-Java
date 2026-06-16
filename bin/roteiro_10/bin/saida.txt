@@ -1,0 +1,76 @@
+=== Compilador Java-- | Roteiro 10 - Escopo de variaveis ===
+Entrada: entrada.txt  |  Saida: saida.txt
+
+--- FASE 1: ANALISE LEXICA ---
+<program, program, linha 2>
+<IDENT, R10, linha 2>
+<{, {, linha 2>
+<int, int, linha 3>
+<IDENT, global, linha 3>
+<;, ;, linha 3>
+<void, void, linha 5>
+<IDENT, externa, linha 5>
+<(, (, linha 5>
+<), ), linha 5>
+<{, {, linha 5>
+<int, int, linha 6>
+<IDENT, local, linha 6>
+<;, ;, linha 6>
+<IDENT, local, linha 7>
+<=, =, linha 7>
+<INT, 5, linha 7>
+<;, ;, linha 7>
+<IDENT, global, linha 8>
+<=, =, linha 8>
+<INT, 10, linha 8>
+<;, ;, linha 8>
+<}, }, linha 9>
+<void, void, linha 11>
+<IDENT, teste, linha 11>
+<(, (, linha 11>
+<), ), linha 11>
+<{, {, linha 11>
+<int, int, linha 12>
+<IDENT, x, linha 12>
+<;, ;, linha 12>
+<IDENT, x, linha 13>
+<=, =, linha 13>
+<INT, 1, linha 13>
+<;, ;, linha 13>
+<{, {, linha 14>
+<int, int, linha 15>
+<IDENT, y, linha 15>
+<;, ;, linha 15>
+<IDENT, y, linha 16>
+<=, =, linha 16>
+<INT, 2, linha 16>
+<;, ;, linha 16>
+<IDENT, x, linha 17>
+<=, =, linha 17>
+<IDENT, y, linha 17>
+<;, ;, linha 17>
+<}, }, linha 18>
+<IDENT, x, linha 19>
+<=, =, linha 19>
+<IDENT, y, linha 19>
+<;, ;, linha 19>
+<int, int, linha 20>
+<IDENT, x, linha 20>
+<;, ;, linha 20>
+<}, }, linha 21>
+<}, }, linha 22>
+<EOF, $EOF, linha 23>
+Tokens: 58 | Erros lexicos: 0
+
+--- FASE 2: ANALISE SINTATICA ---
+Erros sintaticos: 0
+
+--- FASE 3: ANALISE SEMANTICA (Roteiro 10 - Escopo de variaveis) ---
+ERRO SEMANTICO (linha 19): variavel 'y' usada fora de escopo ou nao declarada
+ERRO SEMANTICO (linha 20): variavel 'x' ja declarada neste escopo (nivel 2)
+Erros semanticos: 2
+
+>>> Analise encerrada com erros <<<
+    Erros lexicos   : 0
+    Erros sintaticos: 0
+    Erros semanticos: 2

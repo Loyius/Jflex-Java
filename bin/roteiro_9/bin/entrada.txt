@@ -1,0 +1,18 @@
+/* Roteiro 9: Tipo de retorno */
+program R9 {
+  int retornaInt() {
+    return 42;       /* ok: int <- int */
+  }
+
+  float retornaFloat() {
+    return 3.14;     /* ok: float <- float */
+  }
+
+  int errado() {
+    return 3.14;     /* ERRO: int <- float */
+  }
+
+  void semRetorno() {
+    return 1;        /* ERRO: void nao deve retornar valor */
+  }
+}

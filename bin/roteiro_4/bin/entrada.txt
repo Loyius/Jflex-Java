@@ -1,0 +1,15 @@
+/* Roteiro 4: Expressoes relacionais */
+program R4 {
+  int x;
+  float y;
+  boolean b;
+
+  void teste() {
+    x = 5;
+    y = 2.0;
+    b = true;
+    if (x > y) { print(x); }        /* ok: int vs float */
+    if (x == y) { print(x); }       /* ok: numericos */
+    if (b == x) { print(b); }       /* ERRO: boolean vs int */
+  }
+}

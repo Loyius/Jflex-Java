@@ -1,0 +1,22 @@
+/* Roteiro 10: Escopo de variaveis */
+program R10 {
+  int global;      /* escopo global */
+
+  void externa() {
+    int local;     /* escopo da funcao */
+    local = 5;     /* ok */
+    global = 10;   /* ok: global visivel */
+  }
+
+  void teste() {
+    int x;
+    x = 1;
+    {
+      int y;
+      y = 2;       /* ok: y no escopo interno */
+      x = y;       /* ok: x visivel aqui */
+    }
+    x = y;         /* ERRO: y fora do escopo */
+    int x;         /* ERRO: redeclaracao de x no mesmo escopo */
+  }
+}

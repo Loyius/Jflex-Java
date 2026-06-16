@@ -1,0 +1,331 @@
+/*
+ * Parser.cup — Gramática da linguagem Java-- para uso com Java CUP
+ * Para gerar parser.java + sym.java execute:
+ *   java -jar java-cup.jar -parser parser -symbols sym Parser.cup
+ *
+ * Linguagem: Java-- (Compiladores — 7º CC)
+ * Grupo: Mayssa Barbosa Dias; Larissa Queiroz Ramos; Fernando Medeiros; Matheus Augusto
+ */
+
+/* ─── Imports e código do usuário ─────────────────────────────────────────── */
+import java_cup.runtime.*;
+import java.io.*;
+import java.util.*;
+
+action code {:
+    private java.io.PrintWriter out = null;
+    public void setOutput(java.io.PrintWriter pw) { this.out = pw; }
+    private void msg(String s) {
+        System.out.println(s);
+        if (out != null) out.println(s);
+    }
+:};
+
+parser code {:
+    private java.io.PrintWriter out = null;
+    public void setOutput(java.io.PrintWriter pw) { this.out = pw; }
+
+    @Override
+    public void report_error(String message, Object info) {
+        StringBuilder sb = new StringBuilder("ERRO SINTATICO: " + message);
+        if (info instanceof Symbol) {
+            Symbol s = (Symbol) info;
+            sb.append(" (linha ").append(s.left).append(", col ").append(s.right).append(")");
+        }
+        System.out.println(sb);
+        if (out != null) out.println(sb);
+    }
+
+    @Override
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        throw new RuntimeException("Erro sintático fatal — análise interrompida");
+    }
+:};
+
+/* ─── Terminais ────────────────────────────────────────────────────────────── */
+terminal           KW_PROGRAM, KW_FINAL, KW_CLASS, KW_VOID;
+terminal           KW_INT, KW_FLOAT, KW_BOOLEAN, KW_CHAR, KW_STRING;
+terminal           KW_IF, KW_ELSE, KW_WHILE, KW_FOR;
+terminal           KW_RETURN, KW_NEW, KW_READ, KW_PRINT;
+terminal           KW_TRUE, KW_FALSE, KW_NULL;
+terminal           ASSIGN;                    /* = */
+terminal           EQ, NEQ, LT, GT, LEQ, GEQ;/* ==  !=  <  >  <=  >= */
+terminal           PLUS, MINUS;               /* +  - */
+terminal           STAR, SLASH, PERCENT;      /* *  /  % */
+terminal           AND, OR, NOT;              /* &&  ||  ! */
+terminal           SEMICOLON, COMMA, DOT;     /* ;  ,  . */
+terminal           LPAREN, RPAREN;            /* (  ) */
+terminal           LBRACE, RBRACE;            /* {  } */
+terminal           LBRACKET, RBRACKET;        /* [  ] */
+terminal String    IDENT;
+terminal Integer   INT_LIT, INT_HEX;
+terminal Double    FLOAT_LIT;
+terminal String    CHAR_CONST, STRING_LIT;
+
+/* ─── Não-terminais ────────────────────────────────────────────────────────── */
+non terminal           programa;
+non terminal           corpo_programa;
+non terminal           decl_list;
+non terminal           decl;
+non terminal           tipo;
+non terminal           var_decl;
+non terminal           func_decl;
+non terminal           param_list, param_list_opt;
+non terminal           param;
+non terminal           bloco;
+non terminal           stmt_list;
+non terminal           stmt;
+non terminal           atrib_stmt;
+non terminal           if_stmt;
+non terminal           while_stmt;
+non terminal           for_stmt;
+non terminal           return_stmt;
+non terminal           print_stmt;
+non terminal           read_stmt;
+non terminal           expr;
+non terminal           expr_or;
+non terminal           expr_and;
+non terminal           expr_rel;
+non terminal           expr_add;
+non terminal           expr_mul;
+non terminal           expr_unary;
+non terminal           expr_prim;
+non terminal           call_args, call_args_opt;
+non terminal           ident_suffix;
+
+/* ─── Precedências (menor para maior) ──────────────────────────────────────── */
+precedence left  OR;
+precedence left  AND;
+precedence left  EQ, NEQ;
+precedence left  LT, GT, LEQ, GEQ;
+precedence left  PLUS, MINUS;
+precedence left  STAR, SLASH, PERCENT;
+precedence right NOT;
+precedence right UMINUS;
+
+/* ─── Regras de produção ─────────────────────────────────────────────────────*/
+
+/* Programa principal */
+programa ::=
+      KW_PROGRAM IDENT:nome LBRACE corpo_programa RBRACE
+    | KW_CLASS   IDENT:nome LBRACE corpo_programa RBRACE
+    ;
+
+corpo_programa ::=
+      decl_list
+    | /* vazio */
+    ;
+
+/* Lista de declarações de alto nível */
+decl_list ::=
+      decl_list decl
+    | decl
+    ;
+
+decl ::=
+      var_decl
+    | func_decl
+    ;
+
+/* ── Tipo ──────────────────────────────────────────────────────────────────── */
+tipo ::=
+      KW_INT
+    | KW_FLOAT
+    | KW_BOOLEAN
+    | KW_CHAR
+    | KW_STRING
+    | KW_VOID
+    | IDENT               /* tipos de classes definidos pelo usuário */
+    ;
+
+/* ── Declaração de variável ─────────────────────────────────────────────────── */
+var_decl ::=
+      KW_FINAL tipo IDENT ASSIGN expr SEMICOLON
+    | tipo IDENT ASSIGN expr SEMICOLON
+    | tipo IDENT SEMICOLON
+    | tipo IDENT COMMA ident_list SEMICOLON
+    ;
+
+/* Lista extra de idents numa mesma declaração: int x, y, z; */
+non terminal ident_list;
+ident_list ::=
+      ident_list COMMA IDENT
+    | IDENT
+    ;
+
+/* ── Declaração de função/procedimento ──────────────────────────────────────── */
+func_decl ::=
+      tipo IDENT LPAREN param_list_opt RPAREN bloco
+    ;
+
+param_list_opt ::=
+      param_list
+    | /* vazio */
+    ;
+
+param_list ::=
+      param_list COMMA param
+    | param
+    ;
+
+param ::=
+      tipo IDENT
+    ;
+
+/* ── Bloco { stmts } ─────────────────────────────────────────────────────────── */
+bloco ::=
+      LBRACE stmt_list RBRACE
+    | LBRACE RBRACE
+    ;
+
+/* ── Lista de comandos ───────────────────────────────────────────────────────── */
+stmt_list ::=
+      stmt_list stmt
+    | stmt
+    ;
+
+/* ── Comando ─────────────────────────────────────────────────────────────────── */
+stmt ::=
+      var_decl
+    | atrib_stmt
+    | if_stmt
+    | while_stmt
+    | for_stmt
+    | return_stmt
+    | print_stmt
+    | read_stmt
+    | IDENT LPAREN call_args_opt RPAREN SEMICOLON    /* chamada de procedimento */
+    | bloco
+    | SEMICOLON                                       /* stmt vazio */
+    ;
+
+/* Atribuição */
+atrib_stmt ::=
+      IDENT ASSIGN expr SEMICOLON
+    | IDENT LBRACKET expr RBRACKET ASSIGN expr SEMICOLON
+    ;
+
+/* if / if-else */
+if_stmt ::=
+      KW_IF LPAREN expr RPAREN stmt
+    | KW_IF LPAREN expr RPAREN stmt KW_ELSE stmt
+    ;
+
+/* while */
+while_stmt ::=
+      KW_WHILE LPAREN expr RPAREN stmt
+    ;
+
+/* for */
+for_stmt ::=
+      KW_FOR LPAREN for_init SEMICOLON expr SEMICOLON for_update RPAREN stmt
+    ;
+
+non terminal for_init;
+for_init ::=
+      tipo IDENT ASSIGN expr
+    | IDENT ASSIGN expr
+    | /* vazio */
+    ;
+
+non terminal for_update;
+for_update ::=
+      IDENT ASSIGN expr
+    | /* vazio */
+    ;
+
+/* return */
+return_stmt ::=
+      KW_RETURN expr SEMICOLON
+    | KW_RETURN SEMICOLON
+    ;
+
+/* print */
+print_stmt ::=
+      KW_PRINT LPAREN call_args_opt RPAREN SEMICOLON
+    ;
+
+/* read */
+read_stmt ::=
+      KW_READ LPAREN IDENT RPAREN SEMICOLON
+    ;
+
+/* ── Expressões (hierarquia de precedência) ─────────────────────────────────── */
+
+expr ::=
+      expr_or
+    ;
+
+expr_or ::=
+      expr_or OR expr_and
+    | expr_and
+    ;
+
+expr_and ::=
+      expr_and AND expr_rel
+    | expr_rel
+    ;
+
+expr_rel ::=
+      expr_add EQ  expr_add
+    | expr_add NEQ expr_add
+    | expr_add LT  expr_add
+    | expr_add GT  expr_add
+    | expr_add LEQ expr_add
+    | expr_add GEQ expr_add
+    | expr_add
+    ;
+
+expr_add ::=
+      expr_add PLUS  expr_mul
+    | expr_add MINUS expr_mul
+    | expr_mul
+    ;
+
+expr_mul ::=
+      expr_mul STAR    expr_unary
+    | expr_mul SLASH   expr_unary
+    | expr_mul PERCENT expr_unary
+    | expr_unary
+    ;
+
+expr_unary ::=
+      MINUS expr_prim  %prec UMINUS
+    | NOT   expr_prim
+    | expr_prim
+    ;
+
+expr_prim ::=
+      INT_LIT
+    | INT_HEX
+    | FLOAT_LIT
+    | CHAR_CONST
+    | STRING_LIT
+    | KW_TRUE
+    | KW_FALSE
+    | KW_NULL
+    | IDENT ident_suffix
+    | LPAREN expr RPAREN
+    | KW_NEW IDENT LPAREN call_args_opt RPAREN
+    | KW_NEW tipo LBRACKET expr RBRACKET
+    ;
+
+/* suffix após IDENT: chamada, acesso a campo, índice, ou nada */
+ident_suffix ::=
+      LPAREN call_args_opt RPAREN          /* chamada de função */
+    | LBRACKET expr RBRACKET               /* acesso a array */
+    | DOT IDENT ident_suffix               /* acesso a campo */
+    | /* vazio */
+    ;
+
+/* Argumentos de chamada */
+call_args_opt ::=
+      call_args
+    | /* vazio */
+    ;
+
+call_args ::=
+      call_args COMMA expr
+    | expr
+    ;

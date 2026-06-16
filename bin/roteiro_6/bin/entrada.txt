@@ -1,0 +1,14 @@
+/* Roteiro 6: Condicao if/else booleana */
+program R6 {
+  int x;
+  boolean ativo;
+
+  void teste() {
+    x = 5;
+    ativo = true;
+    if (x > 0) { print(x); }      /* ok: relacional boolean */
+    if (ativo) { print(ativo); }  /* ok: variavel boolean */
+    if (x) { print(x); }          /* ERRO: int nao e boolean */
+    if (x + 1) { print(x); }      /* ERRO: aritmetica nao e boolean */
+  }
+}

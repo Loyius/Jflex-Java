@@ -1,0 +1,13 @@
+/* Roteiro 7: Condicao while booleana */
+program R7 {
+  int i;
+  boolean continua;
+
+  void teste() {
+    i = 0;
+    continua = true;
+    while (i < 10) { i = i + 1; }  /* ok */
+    while (continua) { i = i + 1; } /* ok */
+    while (i) { i = i + 1; }       /* ERRO: int nao e boolean */
+  }
+}

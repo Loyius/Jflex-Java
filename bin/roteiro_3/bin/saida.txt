@@ -1,0 +1,67 @@
+=== Compilador Java-- | Roteiro 3 - Expressoes aritmeticas ===
+Entrada: entrada.txt  |  Saida: saida.txt
+
+--- FASE 1: ANALISE LEXICA ---
+<program, program, linha 2>
+<IDENT, R3, linha 2>
+<{, {, linha 2>
+<int, int, linha 3>
+<IDENT, a, linha 3>
+<;, ;, linha 3>
+<float, float, linha 4>
+<IDENT, b, linha 4>
+<;, ;, linha 4>
+<boolean, boolean, linha 5>
+<IDENT, flag, linha 5>
+<;, ;, linha 5>
+<void, void, linha 7>
+<IDENT, teste, linha 7>
+<(, (, linha 7>
+<), ), linha 7>
+<{, {, linha 7>
+<IDENT, a, linha 8>
+<=, =, linha 8>
+<INT, 5, linha 8>
+<;, ;, linha 8>
+<IDENT, b, linha 9>
+<=, =, linha 9>
+<FLOAT, 2.0, linha 9>
+<;, ;, linha 9>
+<IDENT, flag, linha 10>
+<=, =, linha 10>
+<true, true, linha 10>
+<;, ;, linha 10>
+<IDENT, a, linha 11>
+<=, =, linha 11>
+<IDENT, a, linha 11>
+<+, +, linha 11>
+<IDENT, b, linha 11>
+<;, ;, linha 11>
+<IDENT, b, linha 12>
+<=, =, linha 12>
+<IDENT, a, linha 12>
+<*, *, linha 12>
+<IDENT, b, linha 12>
+<;, ;, linha 12>
+<IDENT, a, linha 13>
+<=, =, linha 13>
+<IDENT, flag, linha 13>
+<+, +, linha 13>
+<INT, 1, linha 13>
+<;, ;, linha 13>
+<}, }, linha 14>
+<}, }, linha 15>
+<EOF, $EOF, linha 16>
+Tokens: 50 | Erros lexicos: 0
+
+--- FASE 2: ANALISE SINTATICA ---
+Erros sintaticos: 0
+
+--- FASE 3: ANALISE SEMANTICA (Roteiro 3 - Expressoes aritmeticas) ---
+ERRO SEMANTICO (linha 13): operando esquerdo de '+' nao e numerico (tipo: boolean)
+Erros semanticos: 1
+
+>>> Analise encerrada com erros <<<
+    Erros lexicos   : 0
+    Erros sintaticos: 0
+    Erros semanticos: 1

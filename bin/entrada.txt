@@ -1,0 +1,70 @@
+/* entrada.txt — Arquivo de teste para o compilador Java--
+   Cobre: declarações, atribuição, if/else, while, for,
+          expressões aritméticas, relacionais, lógicas,
+          funções, chamadas, comentários, erros léxicos.
+*/
+
+program Exemplo {
+
+  /* declarações de variáveis globais */
+  final int MAX = 100;
+  int contador;
+  float media;
+  boolean ativo;
+  char letra;
+
+  /* função que calcula fatorial */
+  int fatorial(int n) {
+    if (n <= 1) {
+      return 1;
+    } else {
+      return n * fatorial(n - 1);
+    }
+  }
+
+  /* função principal */
+  void main() {
+
+    /* atribuições simples */
+    contador = 0;
+    media    = 0.0;
+    ativo    = true;
+    letra    = 'A';
+
+    /* estrutura while */
+    while (contador < MAX) {
+      media = media + contador;
+      contador = contador + 1;
+    }
+
+    /* estrutura for */
+    for (int i = 0; i < 10; i = i + 1) {
+      print(i);
+    }
+
+    /* estrutura if / else if / else */
+    if (media > 50.0) {
+      print("media alta");
+    } else {
+      if (media == 0.0) {
+        print("media zero");
+      } else {
+        print("media baixa");
+      }
+    }
+
+    /* expressões aritméticas */
+    int resultado = (MAX - contador) * 2 + fatorial(5);
+
+    /* expressões lógicas */
+    if (ativo && (contador != 0)) {
+      print("ativo e com contador");
+    }
+
+    /* leitura de variável */
+    read(contador);
+
+    /* resultado final */
+    print(resultado);
+  }
+}

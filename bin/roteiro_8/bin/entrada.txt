@@ -1,0 +1,18 @@
+/* Roteiro 8: Declaracao e chamada de funcoes */
+program R8 {
+  int soma(int a, int b) {
+    return a + b;
+  }
+
+  void imprime(int x) {
+    print(x);
+  }
+
+  void teste() {
+    int r;
+    r = soma(3, 4);       /* ok: aridade 2 */
+    r = soma(3);          /* ERRO: aridade errada (1 arg, esperado 2) */
+    imprime(r);           /* ok: aridade 1 */
+    naoExiste(r);         /* ERRO: funcao nao declarada */
+  }
+}

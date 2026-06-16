@@ -1,0 +1,87 @@
+=== Compilador Java-- | Roteiro 8 - Declaracao e chamada de funcoes ===
+Entrada: entrada.txt  |  Saida: saida.txt
+
+--- FASE 1: ANALISE LEXICA ---
+<program, program, linha 2>
+<IDENT, R8, linha 2>
+<{, {, linha 2>
+<int, int, linha 3>
+<IDENT, soma, linha 3>
+<(, (, linha 3>
+<int, int, linha 3>
+<IDENT, a, linha 3>
+<,, ,, linha 3>
+<int, int, linha 3>
+<IDENT, b, linha 3>
+<), ), linha 3>
+<{, {, linha 3>
+<return, return, linha 4>
+<IDENT, a, linha 4>
+<+, +, linha 4>
+<IDENT, b, linha 4>
+<;, ;, linha 4>
+<}, }, linha 5>
+<void, void, linha 7>
+<IDENT, imprime, linha 7>
+<(, (, linha 7>
+<int, int, linha 7>
+<IDENT, x, linha 7>
+<), ), linha 7>
+<{, {, linha 7>
+<print, print, linha 8>
+<(, (, linha 8>
+<IDENT, x, linha 8>
+<), ), linha 8>
+<;, ;, linha 8>
+<}, }, linha 9>
+<void, void, linha 11>
+<IDENT, teste, linha 11>
+<(, (, linha 11>
+<), ), linha 11>
+<{, {, linha 11>
+<int, int, linha 12>
+<IDENT, r, linha 12>
+<;, ;, linha 12>
+<IDENT, r, linha 13>
+<=, =, linha 13>
+<IDENT, soma, linha 13>
+<(, (, linha 13>
+<INT, 3, linha 13>
+<,, ,, linha 13>
+<INT, 4, linha 13>
+<), ), linha 13>
+<;, ;, linha 13>
+<IDENT, r, linha 14>
+<=, =, linha 14>
+<IDENT, soma, linha 14>
+<(, (, linha 14>
+<INT, 3, linha 14>
+<), ), linha 14>
+<;, ;, linha 14>
+<IDENT, imprime, linha 15>
+<(, (, linha 15>
+<IDENT, r, linha 15>
+<), ), linha 15>
+<;, ;, linha 15>
+<IDENT, naoExiste, linha 16>
+<(, (, linha 16>
+<IDENT, r, linha 16>
+<), ), linha 16>
+<;, ;, linha 16>
+<}, }, linha 17>
+<}, }, linha 18>
+<EOF, $EOF, linha 19>
+Tokens: 69 | Erros lexicos: 0
+
+--- FASE 2: ANALISE SINTATICA ---
+Erros sintaticos: 0
+
+--- FASE 3: ANALISE SEMANTICA (Roteiro 8 - Declaracao e chamada de funcoes) ---
+ERRO SEMANTICO (linha 14): chamada de 'soma': esperado 2 argumento(s), encontrado 1
+ERRO SEMANTICO (linha 16): funcao 'naoExiste' nao declarada
+Erros semanticos: 2
+
+>>> Analise encerrada com erros <<<
+    Erros lexicos   : 0
+    Erros sintaticos: 0
+    Erros semanticos: 2
